@@ -27,18 +27,49 @@ app.get("/books", (req, res) => {
 });
 
 app.post("/books", (req, res) => {
-  const q = "INSERT INTO books (`title`, `desc`, `cover`) VALUES (?)";
-  const values = [req.body.title, req.body.desc, req.body.cover];
+  const q = "INSERT INTO books (`title`, `price`, `desc`, `cover`) VALUES (?)";
+  const values = [req.body.title, req.body.price, req.body.desc, "cover.jpg"];
+  console.log(values);
 
   db.query(q, [values], (err, data) => {
+    console.log(values);
     if (err) return res.json(err);
     return res.json({
       status: 200,
       message: "Book has been created successfully",
       title: req.body.title,
       desc: req.body.desc,
-      cover: req.body.cover,
+      cover: "cover-image",
     });
+  });
+});
+
+app.delete("/books/:id", (req, res) => {
+  const { id } = req.params;
+  const q = "DELETE FROM books WHERE id =?";
+  db.query(q, [id], (err, data) => {
+    if (err) return res.json(err);
+    return res.json("Book has been deleted successfully");
+  });
+});
+
+app.get("/books/:id", (req, res) => {
+  const { id } = req.params;
+  const q = "SELECT * FROM books where id =?";
+  db.query(q, [id], (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data[0]);
+  });
+});
+
+app.put("/books/:id", (req, res) => {
+  const { id } = req.params;
+  const q = "UPDATE books SET `title`=?, `price`=?, `desc`=? WHERE id =?";
+  const values = [req.body.title, req.body.price, req.body.desc];
+  db.query(q, [...values, id], (err, data) => {
+    console.log([...values, id]);
+    if (err) return res.json(err);
+    return res.json("Book has been updated successfully");
   });
 });
 
